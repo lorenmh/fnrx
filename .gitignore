@@ -1,0 +1,5 @@
+*.swp
+*.swo
+node_modules/
+dist/js/*.js
+!dist/js/.gitkeep

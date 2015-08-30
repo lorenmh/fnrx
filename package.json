@@ -1,0 +1,14 @@
+{
+  "name": "fnrx",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "bundle": "./scripts/bundle.sh"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "browserify": "^11.0.1"
+  }
+}
