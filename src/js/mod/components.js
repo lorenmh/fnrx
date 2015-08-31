@@ -4,31 +4,13 @@ var React = require( 'react' ),
     Reflux = require( 'reflux' )
 ;
 
-// var TextInput = React.createClass({
-//   displayName: 'TextInput',
-
-//   componentDidMount: function() {
-//     this
-//   },
-
-//   render: function() {
-//     return React.createElement( 'div', { className: 'text-input' },
-//       React.createElement( 'label', { className: 'text-input-label' }, this.props.label,
-//         React.createElement( 'input', { className: 'text-input-field', type: 'text' } )
-//       )
-//     );
-//   }
-// });
-
-// var CommentForm = React.createClass({
-//   render: function() {
-//     return React.createElement( 'form', { className: 'comment-form' },
-//       React.createElement( TextInput, { label: 'This is the label' } )
-//     );
-//   }
-// });
-
 var DisplayCount = React.createClass({
+  getInitialState: function() {
+    return {
+      count: countStore.count
+    };
+  },
+
   componentDidMount: function() {
     this.unsubscribe = countStore.listen( this.onCountChange );
   },
@@ -38,7 +20,7 @@ var DisplayCount = React.createClass({
   },
 
   onCountChange: function( count ) {
-    this.setProps({
+    this.setState({
       count: count
     });
   },
@@ -46,28 +28,30 @@ var DisplayCount = React.createClass({
   render: function() {
     return React.createElement( 'div', null,
       'Counts: ',
-      this.props.count
+      this.state.count
     );
   }
 });
 
-var countUpdate = Reflux.createAction({
-  count: { children: [ 'aa' ]}
-});
+var countActions = Reflux.createActions([
+  'increment',
+  'decrement'
+]);
 
 var countStore = Reflux.createStore({
   init: function() {
     this.count = 0;
 
-    this.listenTo( countUpdate, this.output );
+    this.listenTo( countActions.increment, this.increment );
+    this.listenTo( countActions.decrement, this.decrement );
   },
 
-  output: function( countType ) {
-    if ( countType === 'increment' ) {
-      this.trigger( ++this.count );
-    } else {
-      this.trigger( --this.count );
-    }
+  increment: function() {
+    this.trigger( ++this.count );
+  },
+
+  decrement: function() {
+    this.trigger( --this.count );
   }
 });
 
@@ -81,7 +65,7 @@ var IncrementButton = React.createClass({
   },
 
   handleClick: function() {
-    countUpdate.trigger( 'increment' );
+    countActions.increment();
   },
 
   render: function() {
@@ -89,7 +73,29 @@ var IncrementButton = React.createClass({
   }
 });
 
-var View = React.createElement('div', null, 
-  DisplayCount,
-  IncrementButton
+var DecrementButton = React.createClass({
+  componentDidMount: function() {
+    this.getDOMNode().addEventListener( 'click', this.handleClick );
+  },
+
+  componentWillUnmount: function() {
+    this.getDOMNode().removeEventListener( 'click', this.handleClick );
+  },
+
+  handleClick: function() {
+    countActions.decrement();
+  },
+
+  render: function() {
+    return React.createElement( 'button', null, 'decrement' );
+  }
+});
+
+React.render(
+    React.createElement('div', null,
+      React.createElement( DisplayCount ),
+      React.createElement( IncrementButton ),
+      React.createElement( DecrementButton )
+    ),
+    document.getElementById('container')
 );
